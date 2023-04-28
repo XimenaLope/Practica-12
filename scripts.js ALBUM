@@ -1,0 +1,2 @@
+const album = new Album();
+album.showThumbnails();
