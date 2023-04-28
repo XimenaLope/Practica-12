@@ -1,0 +1,102 @@
+let grid = document.getElementById("grilla");
+let children = grid.children;
+let childArray = [];
+
+//Tiempo
+let timeElapsed = 0;
+let timerId;
+
+//Movimientos
+let moves = 0;
+
+//Contador de tiempo
+function formatTime(time){
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+    if(seconds < 10){
+        seconds = "0" + seconds;
+    }
+    if(minutes < 10){
+        minutes = "0" + minutes;
+    }
+    return minutes + ":" + seconds;
+}
+
+function startTimer(){
+    timeElapsed = 0;
+    document.getElementById("Tiempo").innerHTML = 0;
+    clearInterval(timerId);
+    timerId = setInterval(function(){
+      timeElapsed++;
+      document.getElementById("Tiempo").innerHTML = formatTime(timeElapsed);
+    }, 1000);
+}
+
+for(let i = 0; i < children.length; i++){
+    childArray.push(children[i]);
+}
+function randomizeGrid(){
+
+    childArray.sort(function(){
+        return 0.5 - Math.random();
+    });
+
+
+    for(let i = 0; i < childArray.length; i++){
+        grid.appendChild(childArray[i]);
+    }
+
+    startTimer();
+
+    updateGame();
+
+}
+
+document.getElementById("JUGAR").onclick = randomizeGrid;
+
+function updateMoves(){
+    document.getElementById("NumeroMovimientos").innerHTML = moves;
+}
+
+function moveTile(tile){
+    let empty = childArray.indexOf(document.getElementById("btn0"));
+    if((tile == empty - 1 && empty % 4 !== 0) || 
+    (tile == empty + 1 && empty % 4 !== 3) || 
+    tile == empty - 4 || 
+    tile == empty + 4){
+        let temp = childArray[tile];
+        childArray[tile] = childArray[empty];
+        childArray[empty] = temp;
+        moves++;
+        updateMoves();
+    }
+    while(grid.firstChild){
+        grid.removeChild(grid.firstChild);
+    }
+
+    updateGame();
+    if(checkGame()){
+        alert("Ganaste");
+
+    }
+    console.log(childArray.indexOf(document.getElementById("btn0")));
+}
+
+function updateGame(){
+    for(let i = 0; i < childArray.length; i++){
+        childArray[i].onclick = function(){
+            moveTile(i);
+        }
+    }
+}
+function checkGame(){
+    for(let i = 0; i < childArray.length-1; i++){
+        if(childArray[i].id !== "btn" + (i+1)){
+            return false;
+        }
+    }
+    clearInterval(timerId);
+    timeElapsed = 0;
+    document.getElementById("Tiempo").innerHTML = "";
+    return true;
+}
